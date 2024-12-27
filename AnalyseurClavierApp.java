@@ -1,56 +1,56 @@
-import javafx.application.Application;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.text.Text;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class AnalyseurClavierApp extends Application {
+public class AnalyseurClavierApp {
     private File fichierTexte;
     private File fichierKlc;
 
     public static void main(String[] args) {
-        launch(args);
+        SwingUtilities.invokeLater(() -> new AnalyseurClavierApp().createAndShowGUI());
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Analyseur de Clavier");
+    private void createAndShowGUI() {
+        JFrame frame = new JFrame("Analyseur de Clavier");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
 
-        Label labelTexte = new Label("Aucun fichier texte sélectionné");
-        Button boutonTexte = new Button("Charger un fichier texte");
-        boutonTexte.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Sélectionner un fichier texte");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers texte", "*.txt"));
-            fichierTexte = fileChooser.showOpenDialog(primaryStage);
-            if (fichierTexte != null) {
+        JLabel labelTexte = new JLabel("Aucun fichier texte sélectionné");
+        JButton boutonTexte = new JButton("Charger un fichier texte");
+        boutonTexte.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Sélectionner un fichier texte");
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Fichiers texte", "txt"));
+            int returnValue = fileChooser.showOpenDialog(frame);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                fichierTexte = fileChooser.getSelectedFile();
                 labelTexte.setText("Fichier texte : " + fichierTexte.getName());
             }
         });
 
-        Label labelKlc = new Label("Aucun fichier KLC sélectionné");
-        Button boutonKlc = new Button("Charger un fichier KLC");
-        boutonKlc.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Sélectionner un fichier KLC");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers KLC", "*.klc"));
-            fichierKlc = fileChooser.showOpenDialog(primaryStage);
-            if (fichierKlc != null) {
+        JLabel labelKlc = new JLabel("Aucun fichier KLC sélectionné");
+        JButton boutonKlc = new JButton("Charger un fichier KLC");
+        boutonKlc.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Sélectionner un fichier KLC");
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Fichiers KLC", "klc"));
+            int returnValue = fileChooser.showOpenDialog(frame);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                fichierKlc = fileChooser.getSelectedFile();
                 labelKlc.setText("Fichier KLC : " + fichierKlc.getName());
             }
         });
 
-        Button boutonLancer = new Button("Lancer l'analyse");
-        Text resultat = new Text();
-        boutonLancer.setOnAction(e -> {
+        JButton boutonLancer = new JButton("Lancer l'analyse");
+        JTextArea resultat = new JTextArea(5, 30);
+        resultat.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(resultat);
+        boutonLancer.addActionListener(e -> {
             if (fichierTexte != null && fichierKlc != null) {
                 try {
                     lancerAnalyse(fichierTexte, fichierKlc);
@@ -63,10 +63,17 @@ public class AnalyseurClavierApp extends Application {
             }
         });
 
-        VBox layout = new VBox(10, boutonTexte, labelTexte, boutonKlc, labelKlc, boutonLancer, resultat);
-        Scene scene = new Scene(layout, 400, 300);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(boutonTexte);
+        panel.add(labelTexte);
+        panel.add(boutonKlc);
+        panel.add(labelKlc);
+        panel.add(boutonLancer);
+        panel.add(scrollPane);
+
+        frame.add(panel);
+        frame.setVisible(true);
     }
 
     private void lancerAnalyse(File texte, File klc) throws Exception {
