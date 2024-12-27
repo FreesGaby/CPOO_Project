@@ -8,7 +8,7 @@ public class AnalyseurCorpusImpl implements AnalyseurCorpus {
         Map<String, Integer> statistiques = new HashMap<>();
 
         for (String texte : corpus.getTextes()) {
-            texte = texte.replaceAll("\\s+", " ").trim().toLowerCase();
+           // texte = texte.replaceAll("\\s+", " ").trim().toLowerCase();
 
             for (int i = 0; i < texte.length(); i++) {
                 // 1-grammes
